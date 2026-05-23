@@ -13,7 +13,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- 3. 기본적인 VIM 셋팅
+-- 기본적인 VIM 셋팅
 vim.g.mapleader = " "
 vim.opt.number = true
 vim.opt.relativenumber = false
@@ -34,7 +34,13 @@ if vim.treesitter.language and not vim.treesitter.language.ft_to_lang then
   end
 end
 
--- 2. 내장 Treesitter 구문 강조 및 기능
+-- 자동 저장 설정: 입력 모드에서 빠져나오거나, 일반 모드에서 텍스트가 변경될 때 저장
+vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
+  pattern = { "*" },
+  command = "silent! write",
+})
+
+-- 내장 Treesitter 구문 강조 및 기능
 vim.api.nvim_create_autocmd("FileType", {
   -- 구문 강조를 적용할 언어 지정 (또는 모든 언어 적용을 원하면 pattern = { "*" } 사용)
   pattern = { "lua", "python", "typst", "json", "bash" },
@@ -48,7 +54,7 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- 4. 플러그인 목록 및 설정
+-- 플러그인 목록 및 설정
 require("lazy").setup({
 
   -- 테마
