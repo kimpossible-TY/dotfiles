@@ -42,3 +42,5 @@ if [[ ${BLE_VERSION-} ]]; then
     # 테마 설정 옵션은 존재하지 않으므로 제외하고 순수하게 부착만 수행합니다.
     ble-attach
 fi
+
+alias typst-run="nvim main.typ +TypstPreview"
