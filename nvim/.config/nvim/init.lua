@@ -34,6 +34,20 @@ if vim.treesitter.language and not vim.treesitter.language.ft_to_lang then
   end
 end
 
+-- 2. 내장 Treesitter 구문 강조 및 기능
+vim.api.nvim_create_autocmd("FileType", {
+  -- 구문 강조를 적용할 언어 지정 (또는 모든 언어 적용을 원하면 pattern = { "*" } 사용)
+  pattern = { "lua", "python", "typst", "json", "bash" },
+  callback = function(args)
+    -- 버퍼에 대한 구문 강조(Highlight) 활성화
+    pcall(vim.treesitter.start, args.buf)
+    
+    -- (선택) Treesitter 기반 폴딩(코드 접기) 활성화
+    -- vim.wo.foldmethod = 'expr'
+    -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+  end,
+})
+
 -- 4. 플러그인 목록 및 설정
 require("lazy").setup({
 
@@ -44,40 +58,6 @@ require("lazy").setup({
     priority = 1000,
     config = function()
       vim.cmd([[colorscheme tokyonight]])
-    end,
-  },
-
-  -- 구문 강조 (Treesitter 0.12.0+ 신규 API)
-  {
-    "nvim-treesitter/nvim-treesitter",
-    lazy = false, -- [필수] 새 버전은 지연 로딩을 엄격히 금지함
-    build = ":TSUpdate", -- 플러그인 업데이트 시 파서도 함께 업데이트
-    config = function()
-      local ts = require("nvim-treesitter")
-
-      -- 1. 기본 셋업 (기본값 사용 시 생략 가능하지만, 명시적 관리를 위해 유지)
-      ts.setup({
-        -- 파서 설치 경로를 명시 (선택 사항)
-        install_dir = vim.fn.stdpath('data') .. '/site'
-      })
-
-      -- 2. 필요한 언어 파서 비동기 설치
-      -- 기존의 ensure_installed 역할을 대체함
-      ts.install({ "lua", "python","typst", "json", "bash" })
-
-      -- 3. Treesitter 기능 개별 활성화 (Neovim 자동명령 활용)
-      -- 플러그인 설정이 아닌 버퍼(파일) 단위로 활성화해야 함
-      vim.api.nvim_create_autocmd("FileType", {
-        -- 파서를 설치한 언어들을 매칭 패턴에 등록
-        pattern = { "lua", "python","typst", "json", "bash" },
-        callback = function()
-          -- 구문 강조(Highlight) 활성화
-          vim.treesitter.start()
-
-          -- 들여쓰기(Indent) 활성화 (실험적 기능)
-          -- vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-        end,
-      })
     end,
   },
 
