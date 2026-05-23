@@ -9,7 +9,7 @@ if [ -f ~/.bashrc ] && [ ! -L ~/.bashrc ]; then
 fi
 
 # 2. shell 패키지를 stow하여 내 .bashrc를 홈 디렉터리에 연결
-stow shell
-stow nvim
+stow -t ~ shell
+stow -t ~ nvim
 
 echo "모든 Dotfiles 동기화 완료!"
