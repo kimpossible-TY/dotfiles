@@ -147,6 +147,9 @@ require("lazy").setup({
     config = function()
       local telescope = require("telescope")
       local actions = require("telescope.actions")
+      
+      local builtin = require("telescope.builtin") 
+      vim.keymap.set('n', '<leader>fd', builtin.diagnostics, { desc = "Telescope Diagnostics (에러 모아보기)" })
 
       telescope.setup({
         defaults = {
