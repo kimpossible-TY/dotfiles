@@ -310,6 +310,17 @@ require("lazy").setup({
     open_cmd = nil,
     debug = true
   },
+  },
+  -- ✨ nvim-surround 추가
+  {
+    "kylechui/nvim-surround",
+    version = "*",
+    event = "VeryLazy",
+    config = function()
+      require("nvim-surround").setup({
+        -- 내부에 빈 값({})을 주면 가장 완벽한 기본 단축키 설정으로 작동해!
+      })
+    end
   }
 })
 
