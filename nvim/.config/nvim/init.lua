@@ -13,9 +13,6 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- 시스템 클립보드 사용 설정
-vim.opt.clipboard = "unnamedplus"
-
 -- Codespaces(SSH) 등 원격 환경에서 로컬 Windows와 클립보드 연동 (OSC 52)
 vim.g.clipboard = {
   name = 'OSC 52',
