@@ -29,6 +29,18 @@ vim.g.clipboard = {
   },
 }
 
+if vim.g.vscode then
+  -- [VS Code 모드]
+  
+  -- Ctrl + J 로 터미널 포커스/토글하기
+  vim.keymap.set({'n', 'v', 'i'}, '<C-j>', function()
+    require('vscode').call('workbench.action.terminal.toggleTerminal')
+  end, { desc = "VS Code 터미널 토글" })
+
+else
+  -- [순수 터미널 Neovim 모드]
+end
+
 -- 기본적인 VIM 셋팅
 vim.g.mapleader = " "
 vim.opt.number = true
