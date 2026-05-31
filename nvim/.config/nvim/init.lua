@@ -25,19 +25,6 @@ vim.g.clipboard = {
     ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
   },
 }
-
-if vim.g.vscode then
-  -- [VS Code 모드]
-  
-  -- Ctrl + J 로 터미널 포커스/토글하기
-  vim.keymap.set({'n', 'v', 'i'}, '<C-j>', function()
-    require('vscode').call('workbench.action.terminal.toggleTerminal')
-  end, { desc = "VS Code 터미널 토글" })
-
-else
-  -- [순수 터미널 Neovim 모드]
-end
-
 -- 기본적인 VIM 셋팅
 vim.g.mapleader = " "
 vim.opt.number = true
@@ -321,3 +308,18 @@ require("lazy").setup({
   }
 })
 
+
+-- VS Code의 Neovim 확장과 연동
+if vim.g.vscode then
+  local vscode = require('vscode')
+
+  -- Ctrl + j: 하단 터미널 토글 및 포커스
+  vim.keymap.set({'n', 'v', 'x'}, '<C-j>', function()
+    vscode.action('workbench.action.terminal.toggleTerminal')
+  end, { desc = "Toggle VS Code Terminal" })
+  
+  -- Ctrl + d: VS Code 다중 커서 (다음 일치 항목 선택) 추가
+  vim.keymap.set({'n', 'v', 'x'}, '<C-d>', function()
+    vscode.action('editor.action.addSelectionToNextFindMatch')
+  end, { desc = "VS Code 다중 커서" })
+end
