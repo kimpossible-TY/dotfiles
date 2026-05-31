@@ -311,15 +311,42 @@ require("lazy").setup({
 
 -- VS Code의 Neovim 확장과 연동
 if vim.g.vscode then
-  local vscode = require('vscode')
+  vim.opt.clipboard = ""
 
-  -- Ctrl + j: 하단 터미널 토글 및 포커스
-  vim.keymap.set({'n', 'v', 'x'}, '<C-j>', function()
-    vscode.action('workbench.action.terminal.toggleTerminal')
-  end, { desc = "Toggle VS Code Terminal" })
-  
-  -- Ctrl + d: VS Code 다중 커서 (다음 일치 항목 선택) 추가
-  vim.keymap.set({'n', 'v', 'x'}, '<C-d>', function()
-    vscode.action('editor.action.addSelectionToNextFindMatch')
-  end, { desc = "VS Code 다중 커서" })
+  local vscode = require("vscode")
+
+  vim.keymap.set({ "n", "x" }, "y", function()
+    vscode.action("editor.action.clipboardCopyAction")
+  end, { desc = "VS Code copy" })
+
+  vim.keymap.set("n", "p", function()
+    vscode.action("editor.action.clipboardPasteAction")
+  end, { desc = "VS Code paste" })
+
+  vim.keymap.set("x", "p", function()
+    vscode.action("editor.action.clipboardPasteAction")
+  end, { desc = "VS Code paste over selection" })
+
+  vim.keymap.set({ "n", "x" }, "<C-c>", function()
+    vscode.action("editor.action.clipboardCopyAction")
+  end, { desc = "VS Code Ctrl+C" })
+
+  vim.keymap.set({ "n", "i", "x" }, "<C-v>", function()
+    vscode.action("editor.action.clipboardPasteAction")
+  end, { desc = "VS Code Ctrl+V" })
+
+else
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    },
+  }
+
+  vim.opt.clipboard = "unnamedplus"
 end
