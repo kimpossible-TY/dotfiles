@@ -334,6 +334,12 @@ if vim.g.vscode then
   vim.keymap.set({ "n", "i", "x" }, "<C-v>", function()
     vscode.action("editor.action.clipboardPasteAction")
   end, { desc = "VS Code Ctrl+V" })
+  
+  vim.keymap.set("v", "(", 'c(<C-r>")<Esc>', { desc = "Wrap selection with parentheses" })
+  vim.keymap.set("v", "[", 'c[<C-r>"]<Esc>', { desc = "Wrap selection with brackets" })
+  vim.keymap.set("v", "{", 'c{<C-r>"}<Esc>', { desc = "Wrap selection with braces" })
+  vim.keymap.set("v", '"', 'c"<C-r>""<Esc>', { desc = "Wrap selection with double quotes" })
+  vim.keymap.set("v", "'", "c'<C-r>\"'<Esc>", { desc = "Wrap selection with single quotes" })
 
 else
   vim.g.clipboard = {
