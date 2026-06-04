@@ -349,6 +349,11 @@ if vim.g.vscode then
     vscode.action('editor.action.clipboardCutAction')
 
   end, { desc = "Cut selection to VS Code clipboard" })
+  
+  -- Typst 미리보기 동기화 단축키
+  vim.keymap.set("n", "<C-c>", function()
+    vscode.action("typst-preview.sync")
+  end)
 
 else
   vim.g.clipboard = {
