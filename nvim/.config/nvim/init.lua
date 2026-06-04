@@ -334,6 +334,21 @@ if vim.g.vscode then
   vim.keymap.set({ "n", "i", "x" }, "<C-v>", function()
     vscode.action("editor.action.clipboardPasteAction")
   end, { desc = "VS Code Ctrl+V" })
+  
+  -- Visual mode에서 d를 누르면 VSCode의 cut 실행
+  vim.keymap.set('x', 'd', function()
+
+    vscode.action('editor.action.clipboardCutAction')
+
+  end, { desc = "Cut selection to VS Code clipboard" })
+
+  -- Visual mode에서 D도 동일하게 cut으로 처리하고 싶다면
+
+  vim.keymap.set('x', 'D', function()
+
+    vscode.action('editor.action.clipboardCutAction')
+
+  end, { desc = "Cut selection to VS Code clipboard" })
 
 else
   vim.g.clipboard = {
