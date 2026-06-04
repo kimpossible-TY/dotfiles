@@ -9,6 +9,22 @@ MLX_PORT="${OCO_MLX_PORT:-8080}"
 MLX_URL="http://${MLX_HOST}:${MLX_PORT}/v1/models"
 MLX_LOG="${OCO_MLX_LOG:-/tmp/oco-mlx-server.log}"
 
+if [[ -t 2 && "${NO_COLOR:-}" == "" ]]; then
+  bold=$'\033[1m'
+  dim=$'\033[2m'
+  green=$'\033[32m'
+  yellow=$'\033[33m'
+  red=$'\033[31m'
+  reset=$'\033[0m'
+else
+  bold=""
+  dim=""
+  green=""
+  yellow=""
+  red=""
+  reset=""
+fi
+
 should_start_mlx=true
 case "${1:-}" in
   config|models|setup|hook|commitlint|-h|--help|--version)
@@ -22,22 +38,56 @@ fi
 
 server_started=false
 server_pid=""
+spinner_index=1
 
 server_is_ready() {
   curl -fsS --max-time 1 "$MLX_URL" >/dev/null 2>&1
 }
 
+status_line() {
+  printf '\r%s' "$*" >&2
+}
+
+clear_status_line() {
+  if [[ -t 2 ]]; then
+    printf '\r\033[K' >&2
+  fi
+}
+
+info() {
+  printf '%s\n' "${dim}$*${reset}" >&2
+}
+
+success() {
+  printf '%s\n' "${green}OK${reset} $*" >&2
+}
+
+fail() {
+  printf '%s\n' "${red}ERROR${reset} $*" >&2
+}
+
+next_spinner_frame() {
+  local frames=("|" "/" "-" "\\")
+  printf '%s' "${frames[$spinner_index]}"
+  spinner_index=$((spinner_index % ${#frames[@]} + 1))
+}
+
 stop_started_server() {
+  clear_status_line
   if [[ "$server_started" == "true" && -n "$server_pid" ]]; then
     kill "$server_pid" >/dev/null 2>&1 || true
     wait "$server_pid" >/dev/null 2>&1 || true
+    info "Stopped MLX server."
   fi
 }
 
 trap stop_started_server EXIT INT TERM
 
 if [[ "$should_start_mlx" == "true" ]] && ! server_is_ready; then
-  printf 'Starting MLX server for oco: %s\n' "$MLX_MODEL" >&2
+  info "Starting MLX server for oco."
+  info "Model: ${bold}${MLX_MODEL}${reset}"
+  info "Log: ${MLX_LOG}"
+
   "$MLX_SERVER" --model "$MLX_MODEL" --host "$MLX_HOST" --port "$MLX_PORT" >"$MLX_LOG" 2>&1 &
   server_pid="$!"
   server_started=true
@@ -47,16 +97,24 @@ if [[ "$should_start_mlx" == "true" ]] && ! server_is_ready; then
       break
     fi
     if ! kill -0 "$server_pid" >/dev/null 2>&1; then
-      printf 'MLX server exited before becoming ready. Log: %s\n' "$MLX_LOG" >&2
+      clear_status_line
+      fail "MLX server exited before becoming ready."
+      info "Log: ${MLX_LOG}"
       exit 1
     fi
+    status_line "${yellow}$(next_spinner_frame)${reset} Waiting for MLX server on ${MLX_HOST}:${MLX_PORT}..."
     sleep 1
   done
 
   if ! server_is_ready; then
-    printf 'MLX server did not become ready within 120s. Log: %s\n' "$MLX_LOG" >&2
+    clear_status_line
+    fail "MLX server did not become ready within 120s."
+    info "Log: ${MLX_LOG}"
     exit 1
   fi
+
+  clear_status_line
+  success "MLX server is ready."
 fi
 
 "$REAL_OCO" "$@"
